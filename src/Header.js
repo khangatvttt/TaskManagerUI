@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState}  from 'react';
 import {
   MDBBreadcrumb,
   MDBBreadcrumbItem,
@@ -17,8 +17,11 @@ import {
   MDBBadge,
 } from 'mdb-react-ui-kit';
 
-export default function App() {
+import './Header.css'
+
+function Header() {
   return (
+    <div className='sticky-header'>
     <header>
       {/* Main Navigation */}
       <MDBNavbar expand='lg' light className='bg-white'>
@@ -54,51 +57,6 @@ export default function App() {
               </MDBDropdown>
             </MDBNavbarItem>
 
-            {/* Icon dropdown */}
-            <MDBNavbarItem>
-              <MDBDropdown>
-                <MDBDropdownToggle tag='a' className='hidden-arrow me-3 me-lg-0 nav-link'>
-                  <MDBIcon flag='united-kingdom' className='m-0' />
-                </MDBDropdownToggle>
-                <MDBDropdownMenu>
-                  <MDBDropdownItem link>
-                    <MDBIcon flag='united-kingdom' />
-                    English
-                    <MDBIcon fas icon='check' color='success' className='ms-2' />
-                  </MDBDropdownItem>
-                  <MDBDropdownItem>{/* <MDBDropdownDivider></MDBDropdownDivider> */}</MDBDropdownItem>
-                  <MDBDropdownItem link>
-                    <MDBIcon flag='poland' />
-                    Polski
-                  </MDBDropdownItem>
-                  <MDBDropdownItem link>
-                    <MDBIcon flag='china' />
-                    中文
-                  </MDBDropdownItem>
-                  <MDBDropdownItem link>
-                    <MDBIcon flag='japan' />
-                    日本語
-                  </MDBDropdownItem>
-                  <MDBDropdownItem link>
-                    <MDBIcon flag='germany' />
-                    Deutsch
-                  </MDBDropdownItem>
-                  <MDBDropdownItem link>
-                    <MDBIcon flag='spain' />
-                    Español
-                  </MDBDropdownItem>
-                  <MDBDropdownItem link>
-                    <MDBIcon flag='russia' />
-                    Русский
-                  </MDBDropdownItem>
-                  <MDBDropdownItem link>
-                    <MDBIcon flag='portugal' />
-                    Português
-                  </MDBDropdownItem>
-                </MDBDropdownMenu>
-              </MDBDropdown>
-            </MDBNavbarItem>
-
             {/* Avatar */}
             <MDBNavbarItem>
               <MDBDropdown>
@@ -123,29 +81,10 @@ export default function App() {
       </MDBNavbar>
 
       {/* Heading */}
-      <div className='p-5 bg-light mb-4'>
-        <h1>Dashboard</h1>
-        {/* Breadcrumb */}
-        <MDBContainer fluid>
-          <MDBBreadcrumb bold>
-            <MDBBreadcrumbItem>
-              <a href='' className='text-reset'>
-                Home
-              </a>
-            </MDBBreadcrumbItem>
-            <MDBBreadcrumbItem>
-              <a href='' className='text-reset'>
-                Analytics
-              </a>
-            </MDBBreadcrumbItem>
-            <MDBBreadcrumbItem>
-              <a href='' className='text-reset'>
-                <u>Dashboard</u>
-              </a>
-            </MDBBreadcrumbItem>
-          </MDBBreadcrumb>
-        </MDBContainer>
-      </div>
+      
     </header>
+    </div>
   );
 }
+
+export default Header;
