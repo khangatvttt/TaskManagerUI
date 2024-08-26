@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LoginPage from './LoginPage';
 import TodoList from './TodoList';
-import CustomReporting from './CustomReporting';
+import DetailTask from './DetailTask';
 
 function App() {
   return (
@@ -11,7 +11,7 @@ function App() {
         <Route path="/" element={<LoginPage />}/>
         <Route path="login" element={<LoginPage />} />
         <Route path="home" element={<TodoList />} />
-        <Route path="aaa" element={<CustomReporting />} />
+        <Route path="user/:userId/task/:taskId" element={<DetailTask />} />
       </Routes>
     </BrowserRouter>
   );
