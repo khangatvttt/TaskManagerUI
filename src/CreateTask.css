@@ -1,0 +1,37 @@
+.containerForm {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 70vh; /* Full viewport height */
+}
+
+form {
+  width: 100%;
+  max-width: 600px; /* Limit the form width */
+  padding: 20px;
+  background-color: #fff; /* Optional: Add background color */
+  border-radius: 8px; /* Optional: Add rounded corners */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow */
+}
+.new-task-title {
+    text-align: center;
+    font-weight: bold;
+    font-size: 2rem; /* Adjust size as needed */
+    margin-top: 20px;
+    margin-bottom: 20px; /* Adds space below the title */
+  }
+
+  .invalid-feedback {
+    display: block;
+    margin-top: -25px; /* Adjust margin as needed */
+    margin-bottom: 15px; /* Adds space below the error message */
+    color: #dc3545;
+    font-size: 0.875rem; /* Smaller font size for the error message */
+  }
+  .alert-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000; /* Ensure it's on top */
+  }
+  

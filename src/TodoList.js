@@ -55,7 +55,7 @@ const TodoList = () => {
     }, []);
 
     const handleAddTask = () => {
-        // Add task functionality here
+        navigate('/createTask')
     };
 
     const handleSeeDetail = (taskId) => {
@@ -109,7 +109,7 @@ const TodoList = () => {
                 <div className="todo-list"> 
                     <h1>TODO LIST</h1>
                     <div className="header">
-                        <button onClick={handleAddTask}>ADD</button>
+                        <button onClick={handleAddTask}>New Task</button>
                         <select value={filter} onChange={(e) => setFilter(e.target.value)}>
                             <option value="All">All</option>
                             <option value="Completed">Completed</option>

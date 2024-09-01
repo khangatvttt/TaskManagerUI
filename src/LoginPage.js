@@ -21,7 +21,8 @@ import { jwtDecode } from 'jwt-decode';
 
 
 function LoginPage() {
-  document.body.style = 'background: #dcfaf7';
+  //document.body.style = 'background: #dcfaf7';
+
   const navigate = useNavigate()
 
   const [loginInfo, setLoginInfo] = useState({
