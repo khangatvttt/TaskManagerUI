@@ -12,7 +12,7 @@ import {
 }
 from 'mdb-react-ui-kit';
 import './LoginPage.css'
-import image from './MainLogin.PNG';
+import image from './resource/MainLogin.PNG';
 import accountService from './service/accountService';
 import Alert from '@mui/material/Alert';
 import ErrorIcon from '@mui/icons-material/Error';
@@ -55,7 +55,7 @@ function LoginPage() {
   }
 
   return (
-    <MDBContainer className="my-5">
+    <MDBContainer className="me-7 mt-4">
 
       <MDBCard>
         <MDBRow className='g-0'>
@@ -89,7 +89,7 @@ function LoginPage() {
                           type='password' size="lg" name='password' onChange={handleChange}/>
               <MDBBtn className="mb-4 px-5" color='dark' size='lg' onClick={handleLogin}>Login</MDBBtn>
               <a className="small text-muted" href="#!">Forgot password?</a>
-              <p className="mb-5 pb-lg-2" style={{color: '#393f81'}}>Don't have an account? <a href="#!" style={{color: '#114ffa'}}>Register here</a></p>
+              <p className="mb-5 pb-lg-2" style={{color: '#393f81'}}>Don't have an account? <a href="/register" style={{color: '#114ffa'}}>Register here</a></p>
 
 
             </MDBCardBody>

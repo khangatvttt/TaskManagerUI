@@ -38,16 +38,27 @@ export default function CreateTask() {
   const handleDateChange = (newDate) => {
     setTaskData({
       ...taskData,
-      dueAt: newDate.set('hour', taskData.dueAt.hour()).set('minute', taskData.dueAt.minute())
+      dueAt: taskData.dueAt
+      .set('date', newDate.date())
+      .set('month', newDate.month())
+      .set('year', newDate.year())
+      .set('hour', taskData.dueAt.hour())
+      .set('minute',  taskData.dueAt.minute())
     });
   };
 
   const handleTimeChange = (newTime) => {
     setTaskData({
       ...taskData,
-      dueAt: taskData.dueAt.set('hour', newTime.hour()).set('minute', newTime.minute())
+      dueAt: taskData.dueAt
+      .set('date', taskData.dueAt.date())
+      .set('month', taskData.dueAt.month())
+      .set('year', taskData.dueAt.year())
+      .set('hours', newTime.hour())
+      .set('minutes',  newTime.minute())
     });
   };
+  
 
   const handlePriorityChange = (e) => {
     setTaskData({
@@ -60,7 +71,7 @@ export default function CreateTask() {
     const newErrors = {};
     if (!taskData.taskName.trim()) newErrors.taskName = 'Task name is required';
     if (!taskData.description.trim()) newErrors.description = 'Description is required';
-    if (taskData.dueAt.isBefore(currentTime)) newErrors.dueAt = 'Deadline must be a future date and time';
+    if (taskData.dueAt.isBefore(currentTime)) newErrors.dueAt = 'Deadline must be a future time';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -71,7 +82,7 @@ export default function CreateTask() {
     if (validateForm()) {
       const data = {
         ...taskData,
-        dueAt: taskData.dueAt.toISOString()
+        dueAt: taskData.dueAt.format('YYYY-MM-DDTHH:mm:ss')
       };
       taskService.createTask(data)
       .then(res =>{

@@ -16,18 +16,21 @@ import {
   MDBDropdownItem,
   MDBBadge,
 } from 'mdb-react-ui-kit';
-
+import { useNavigate } from 'react-router-dom';
 import './Header.css'
 
 function Header() {
+  const navigate = useNavigate()
+
+  const handleNavigation = (path) => {
+    navigate(path)
+  }
+
   return (
     <div className='sticky-header'>
     <header>
-      {/* Main Navigation */}
       <MDBNavbar expand='lg' light className='bg-white'>
-        {/* Container wrapper */}
         <MDBContainer fluid>
-          {/* Search form */}
           <MDBInputGroup textAfter={<MDBIcon fas icon='search' />} noBorder>
             <MDBInput
               autoComplete='off'
@@ -70,7 +73,7 @@ function Header() {
                   />
                 </MDBDropdownToggle>
                 <MDBDropdownMenu>
-                  <MDBDropdownItem link>MyProfile</MDBDropdownItem>
+                  <MDBDropdownItem link onClick={()=>handleNavigation(`/user/${localStorage.getItem('User ID')}/profile`)}>MyProfile</MDBDropdownItem>
                   <MDBDropdownItem link>Settings</MDBDropdownItem>
                   <MDBDropdownItem link>Logout</MDBDropdownItem>
                 </MDBDropdownMenu>

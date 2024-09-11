@@ -14,7 +14,8 @@ import {
   MDBProgressBar,
   MDBIcon,
   MDBListGroup,
-  MDBListGroupItem
+  MDBListGroupItem,
+  MDBSpinner 
 } from 'mdb-react-ui-kit';
 import { useParams } from 'react-router-dom';
 import Header from './Header';
@@ -22,11 +23,13 @@ import taskService from './service/taskService';
 import Moment from 'moment';
 import CountDownTimer from './CountDownTimer';
 import StatusBadge from './StatusBadge';
-
-
-
+import { useNavigate, useLocation  } from "react-router-dom";
+import './DetailTask.css'
 
 const DetailPage = () => {
+  const navigate = useNavigate()
+  const location = useLocation();
+
   const { userId, taskId } = useParams()
   const [task, setTask] = useState(null)
 
@@ -49,13 +52,11 @@ const DetailPage = () => {
     const fetchData = async () => {
         taskService.getTaskAssignment(taskId, userId)
         .then(res =>{
-            console.log(res)
             setTask(res.data)
         })
         .catch(e=>{
             console.log(e)
             console.log(e.response.data)
-            setError(e.response.data.error);
         })
 
     };
@@ -63,23 +64,54 @@ const DetailPage = () => {
     fetchData();
   }, []);
 
+  const handleBack = () => {
+    navigate("/home")
+  };
+
+  const handleEdit = () => {
+    navigate(`${location.pathname}/edit`)
+  };
+
   if (!task) {
-    return <div>Loading...</div>; // or some loading spinner
+    return(
+      <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+        <MDBSpinner role="status">
+          <span className="visually-hidden">Loading...</span>
+        </MDBSpinner>
+    </div>
+    );
   }
 
     return (
       <div>
       <Header/>
 
+
+
       <section style={{ backgroundColor: '#eee' }}>
-        <MDBContainer className="py-5">
+        <MDBBtn color="primary"  className="back-button"  onClick={handleBack}>
+            <MDBIcon fas icon="arrow-left" className="me-2" />
+            Back
+        </MDBBtn>
+        <MDBContainer className="py-4">
 
           <MDBRow>
   
             <MDBCol lg="12">
               <MDBCard className="mb-4">
                 <MDBCardBody>
-                <MDBCardText className="mb-4"><b>General Task Infomation</b></MDBCardText>
+                <MDBRow>
+                  <MDBCol sm="10">
+                    <MDBCardText className="mb-4"><b>General Task Infomation</b></MDBCardText>
+                  </MDBCol>
+                    <MDBCol sm="2">
+                    <MDBBtn color="success" onClick={handleEdit} className="edit-button" >
+                      <MDBIcon fas icon="edit" className="me-2" />
+                      Edit
+                    </MDBBtn>
+                  </MDBCol>
+
+                </MDBRow>
                   <MDBRow>
                     <MDBCol sm="3">
                       <MDBCardText>Task name</MDBCardText>
