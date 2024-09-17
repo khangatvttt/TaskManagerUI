@@ -15,9 +15,10 @@ import Header from './Header';
 import userService from './service/userService';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@mui/material/CircularProgress';
+import { useNavigate } from "react-router-dom";
 
 export default function EditProfile() {
-
+  const navigate = useNavigate()
   const [userInfo, setUserInfo] = useState({
     address:'',
     birthdate:'',
@@ -107,11 +108,13 @@ export default function EditProfile() {
     .then(res=>{
       setValidationError(''); 
       setLoading(false); 
+      navigate(`/user/${userId}/profile`)
     })
     .catch(e=>{
       console.error(e);
       setLoading(false); 
-      alert(`Failed to update profile. ${e.response.data || 'Some thing went wrong'}`);
+      alert(`Failed to update profile. ${e.response?.data?.status || 'Something went wrong, please check file type (only accept png, jpeg and gif) or file size (must <15MB)'}`);
+      
     })
   };
 

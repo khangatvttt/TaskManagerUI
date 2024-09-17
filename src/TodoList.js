@@ -46,7 +46,7 @@ const TodoList = () => {
             .catch(e=>{
                 console.log(e)
                 console.log(e.response.data)
-                setError(e.response.data.error);
+                setError(e.response.data);
             })
 
         };
@@ -100,6 +100,14 @@ const TodoList = () => {
         setSnackbarOpen(false);
     };
 
+    if (error){
+        return (
+            <div>
+                {error.status=='Unauthorized'?'Your login has expired, please login again.':error.error}
+            </div>
+        )
+    }
+
     const filteredTasks = filter === 'All' ? tasks : tasks.filter(task => filter === 'Completed' ? task.completed : !task.completed);
 
     return (
@@ -131,7 +139,7 @@ const TodoList = () => {
                                 </div>
                                 <div className="actions">
                                     <Button variant="outlined" color="error" onClick={() => handleDeleteTask(task)} startIcon={<DeleteIcon />}>Delete</Button>
-                                    <Button variant="outlined" color="secondary" startIcon={<EditIcon />}>Edit</Button>
+                                    <Button variant="outlined" color="secondary" onClick={() => navigate(`/user/${localStorage.getItem("User ID")}/task/${task.taskId}/edit`)} startIcon={<EditIcon />}>Edit</Button>
                                 </div>
                             </li>
                         ))}

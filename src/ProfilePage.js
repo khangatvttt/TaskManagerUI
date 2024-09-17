@@ -83,16 +83,27 @@ export default function ProfilePage() {
                 <MDBCardBody className="text-center d-flex justify-content-center align-items-center">
                   <div>
                   <MDBCardImage
-                    src={userInfo.profilePicture}
-                    alt="avatar"
-                    className="rounded-circle mb-4"
-                    style={{ width: '150px' }}
-                    fluid />
+                      src={userInfo.profilePicture}
+                      alt="avatar"
+                      className="rounded-circle mb-4"
+                      style={{
+                        width: '150px',
+                        height: '150px',
+                        objectFit: 'cover', // Ensures the image fills the container
+                      }}
+                      fluid
+                    />
                   <p className="text-muted mb-1">{userInfo.name}</p>
                   <p className="text-muted mb-1">{userId.gender?'Male':'Female'}</p>
                   <p className="text-muted mb-4">{userInfo.mainJob}</p>
                   <div className="d-flex justify-content-center mb-2">
                     <MDBBtn onClick={()=>handleEditButton()}>Update your info</MDBBtn>
+                  </div>
+                  <div className="d-flex justify-content-center mb-3 mt-3">
+                    <MDBBtn color="secondary" onClick={() => navigate('/home')}>
+                      <MDBIcon fas icon="home" className="me-2" />
+                      Back to Home Page
+                    </MDBBtn>
                   </div>
                   </div>
                 </MDBCardBody>

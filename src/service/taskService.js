@@ -55,6 +55,16 @@ class userService{
 
     }
 
+    addMembersToTask(taskId, data){
+        const token = localStorage.getItem('Token')
+        return axios.post(BASE_ACCOUNT_URL + `/${taskId}/addMembers`,data,
+                        { headers: 
+                            {
+                                "Authorization" : `Bearer ${token}`
+                            } 
+                        })
+    }
+
 }
 
 export default new userService()

@@ -42,6 +42,14 @@ class userService{
           },
         });
       };
+    getNotifications(userId, size, page){
+        const token = localStorage.getItem('Token')
+        return axios.get(BASE_ACCOUNT_URL + `/${userId}/notification?page=${page}&size=${size}`, {
+          headers: {
+            "Authorization" : `Bearer ${token}`
+          },
+        });
+      };
 
 }
 
