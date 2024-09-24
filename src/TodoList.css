@@ -154,3 +154,11 @@
 .clickable:hover {
   color: rgb(1, 1, 104); 
 }
+
+.countdown-container {
+  display: inline-block;
+  width: 80px; 
+  margin-left: 5px;
+  text-align: left; 
+  font-size: 15px; 
+}

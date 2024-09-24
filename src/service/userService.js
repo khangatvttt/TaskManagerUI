@@ -51,6 +51,15 @@ class userService{
         });
       };
 
+    countUnreadNotification(userId){
+      const token = localStorage.getItem('Token')
+        return axios.get(BASE_ACCOUNT_URL + `/${userId}/notification/unread-count`, {
+          headers: {
+            "Authorization" : `Bearer ${token}`
+          },
+        });
+    }
+
 }
 
 export default new userService()

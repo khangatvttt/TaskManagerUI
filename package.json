@@ -10,6 +10,7 @@
     "@mui/material": "^6.0.0",
     "@mui/x-date-pickers": "^7.14.0",
     "axios": "^1.7.5",
+    "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "jwt-decode": "^4.0.0",
     "mdb-react-ui-kit": "8.0.0",

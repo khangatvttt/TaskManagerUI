@@ -189,18 +189,39 @@ const DetailPage = () => {
                   <MDBCol sm="8">
                     <MDBCardText className="mb-4"><b>General Task Infomation</b></MDBCardText>
                   </MDBCol>
-                  <MDBCol sm="2">
-                    <MDBBtn disabled={localStorage.getItem("User ID")!=task.taskOwnerId} color="secondary" onClick={handleOpenDialog} >
-                      <MDBIcon fas icon="user-plus" className="me-2" />
-                      Add member
-                    </MDBBtn>
-                  </MDBCol>
+                  {!task.accept ?
+                    <>
                     <MDBCol sm="2">
-                    <MDBBtn color="success" onClick={handleEdit} className="edit-button" >
-                      <MDBIcon fas icon="edit" className="me-2" />
-                      Edit
-                    </MDBBtn>
-                  </MDBCol>
+                      <MDBBtn color="success" onClick={handleOpenDialog} >
+                        <MDBIcon fas icon="check" className="me-2" />
+                        Accept Task
+                      </MDBBtn>
+                      </MDBCol>
+                        <MDBCol sm="2">
+                        <MDBBtn color="danger" onClick={handleEdit} >
+                          <MDBIcon fas icon="ban" className="me-2" />
+                          Refuse Task
+                        </MDBBtn>
+                      </MDBCol>
+                    </>
+                   :(
+                    <>
+                    <MDBCol sm="2">
+                      {localStorage.getItem("User ID")==task.taskOwnerId &&
+                      <MDBBtn color="secondary" onClick={handleOpenDialog} >
+                        <MDBIcon fas icon="user-plus" className="me-2" />
+                        Add member
+                      </MDBBtn>
+                      }
+                    </MDBCol>
+                      <MDBCol sm="2">
+                      <MDBBtn color="success" onClick={handleEdit} className="edit-button" >
+                        <MDBIcon fas icon="edit" className="me-2" />
+                        Edit
+                      </MDBBtn>
+                    </MDBCol>
+                    </>
+                  )}
                      <Dialog
                       open={openAddMember}
                       onClose={handleCloseDialog}

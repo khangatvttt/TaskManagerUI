@@ -15,34 +15,63 @@ import {
   MDBDropdownMenu,
   MDBDropdownItem,
   MDBBadge,
-  MDBBtn
+  MDBSpinner
 } from 'mdb-react-ui-kit';
 import { useNavigate } from 'react-router-dom';
 import './Header.css'
 import userService from './service/userService';
+import { formatDistanceToNow } from 'date-fns';
 
 function Header() {
   const navigate = useNavigate()
   const [notifications, setNotifications] = useState([])
   const [page, setPage] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [unreadNumber, setUnreadNumber] = useState(0)
 
   useEffect(() => {
+    const pageSize = 5
     const fetchDataNotification = () => {
-        userService.getNotifications(localStorage.getItem("User ID"), 2, page)
-        .then(res => setNotifications(res.data))
-        .catch(error =>{
-          console.log(error)
+      userService.getNotifications(localStorage.getItem("User ID"), pageSize, page)
+        .then(res => {
+          setNotifications(prev => [...prev, ...res.data])
+          if (res.data.length < pageSize) {
+            setHasMore(false); // No more notifications to load
+          }
+          setLoading(false)
         })
-
+        .catch(error => {
+          console.log(error);
+          setLoading(false);
+        });
     };
 
     fetchDataNotification();
-  }, []);
+  }, [page]);
 
+  useEffect(()=>{
+    userService.countUnreadNotification(localStorage.getItem("User ID"))
+    .then(res => setUnreadNumber(res.data))
+    .catch(err => console.log(err))
+  }, [])
+
+  const loadMoreNotifications = (event) => {
+    event.stopPropagation(); 
+    event.preventDefault();
+    setPage(prev => prev + 1);
+    setLoading(true); 
+  };
+
+  const onClick = (path) =>{
+    console.log(path)
+  }
 
   const handleNavigation = (path) => {
     navigate(path)
   }
+
+
 
   const logout = () =>{
     localStorage.clear()
@@ -67,39 +96,73 @@ function Header() {
           <MDBNavbarNav className='d-flex flex-row' right fullWidth={false}>
             <MDBNavbarItem>
               <MDBDropdown>
-                <MDBDropdownToggle tag='a' className='hidden-arrow me-3 me-lg-0 nav-link' style={{ cursor: 'pointer' }}>
-                  <MDBIcon fas icon='bell' />
-                  <MDBBadge pill notification color='danger'>
-                    1
-                  </MDBBadge>
-                </MDBDropdownToggle>
-                <MDBDropdownMenu>
+              <MDBDropdownToggle tag='a' className='hidden-arrow me-3 me-lg-0 nav-link' style={{ cursor: 'pointer' }}>
+                <MDBIcon fas icon='bell' />
+                <MDBBadge pill notification color='danger'>
+                  {unreadNumber}
+                </MDBBadge>
+              </MDBDropdownToggle>
+                <MDBDropdownMenu style={{ maxHeight: '300px', overflowY: 'auto' }}>
                   {notifications.length > 0 ? (
                     notifications.map((notification, index) => (
-                      <MDBDropdownItem key={index} link>
-                      {!notification.isRead && ( // If notification is unread, show a small blue dot
-                        <span 
-                          style={{
-                            height: '8px',
-                            width: '8px',
-                            backgroundColor: 'blue',
-                            borderRadius: '50%',
-                            display: 'inline-block',
-                            marginRight: '8px'
-                          }}
-                        ></span>
-                      )}
-                      {notification.notification} {/* Display notification text */}
-                    </MDBDropdownItem>
+                      <MDBDropdownItem key={index} link onClick={()=>handleNavigation(notification.targetUrl)}>
+                        {!notification.read && (
+                          <span 
+                            style={{
+                              height: '8px',
+                              width: '8px',
+                              backgroundColor: 'blue',
+                              borderRadius: '50%',
+                              display: 'inline-block',
+                              marginRight: '8px'
+                            }}
+                          ></span>
+                        )}
+                        {notification.notification} 
+                        <br />
+                        <small style={{ color: '#888' }}>
+                          {formatDistanceToNow(new Date(notification.time), { addSuffix: true })} {/* Display relative time */}
+                        </small>
+                      </MDBDropdownItem>
                     ))
                   ) : (
-                    <MDBDropdownItem link>No notifications available</MDBDropdownItem>
+                    <MDBDropdownItem link>Notification is empty</MDBDropdownItem>
                   )}
-                  <MDBDropdownItem link >
-                    <a>Load more notifications</a>
-                  </MDBDropdownItem>
+                  
+                  {hasMore ? (
+                    <MDBDropdownItem link onClick={loadMoreNotifications} disabled={loading}>
+                      <span 
+                        style={{
+                          display: 'block',
+                          textAlign: 'center',
+                          color: '#007bff',
+                          cursor: 'pointer',
+                          padding: '10px 0',
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        {loading ? (
+                          <MDBSpinner small role="status" tag="span" className="me-2">
+                            <span className="visually-hidden">Loading...</span>
+                          </MDBSpinner>
+                        ) : (
+                          "Load more notifications"
+                        )}
+                      </span>
+                    </MDBDropdownItem>
+                  ):<span 
+                        style={{
+                          display: 'block',
+                          textAlign: 'center',
+                          color: '#007bff',
+                          cursor: 'pointer',
+                          padding: '10px 0',
+                          fontWeight: 'bold'
+                        }}
+                      >
+                          No more notification
+                      </span>}
                 </MDBDropdownMenu>
-
               </MDBDropdown>
             </MDBNavbarItem>
 
@@ -125,12 +188,9 @@ function Header() {
           </MDBNavbarNav>
         </MDBContainer>
       </MDBNavbar>
-
-      {/* Heading */}
       
     </header>
     </div>
   );
 }
-
 export default Header;

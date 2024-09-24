@@ -65,6 +65,14 @@ class userService{
                         })
     }
 
+    acceptTask(taskId, userId){
+        return this.updateTaskAssignment(taskId, userId, 
+            {
+                isAccept:true
+            }
+        )
+    }
+
 }
 
 export default new userService()

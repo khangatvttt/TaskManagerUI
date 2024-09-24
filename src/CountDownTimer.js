@@ -32,7 +32,7 @@ const CountdownTimer = ({ targetDate }) => {
           timeLeft = `${seconds}s left`;
         }
       } else {
-        timeLeft = 'Time is up!';
+        timeLeft = "Time's up";
       }
 
       setTimeLeft(timeLeft);
