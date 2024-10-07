@@ -53,6 +53,7 @@ const DetailPage = () => {
   const [successCount, setSuccessCount] = useState(0);
   const [response, setResponse] = useState(null);
   const [openResponse, setOpenResponse] = useState(false);
+  const [fetchError, setFetchError] = useState(null)
 
   function timeLeft(timeStart,timeEnd) {
     const start = new Date(timeStart)
@@ -77,7 +78,9 @@ const DetailPage = () => {
         })
         .catch(e=>{
             console.log(e)
-            console.log(e.response.data)
+            if (e.response.status===404){
+              setFetchError("Task is no longer existed")
+            }
         })
 
     };
@@ -157,7 +160,38 @@ const DetailPage = () => {
     }
   }, [response]);
 
-  if (!task) {
+  const handelAcceptTask = ()=>{
+    taskService.acceptTask(taskId, localStorage.getItem('User ID'))
+    .then(
+      window.location.reload()
+    )
+    .catch(
+      console.log.error
+    )
+
+  }
+
+  const handleRefuseTask = () =>{
+    taskService.abandonTaskAssignment(taskId, localStorage.getItem('User ID'))
+    .then(
+      navigate('/home')
+    )
+    .catch(e=>
+      console.log(e)
+    )
+
+
+  }
+
+
+  if (fetchError!=null){
+    return(
+      <div>
+        {fetchError}
+      </div>
+    )
+  }
+  else if (!task) {
     return(
       <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
         <MDBSpinner role="status">
@@ -186,19 +220,21 @@ const DetailPage = () => {
               <MDBCard className="mb-4">
                 <MDBCardBody>
                 <MDBRow>
-                  <MDBCol sm="8">
+                  <MDBCol sm="6">
                     <MDBCardText className="mb-4"><b>General Task Infomation</b></MDBCardText>
                   </MDBCol>
                   {!task.accept ?
                     <>
                     <MDBCol sm="2">
-                      <MDBBtn color="success" onClick={handleOpenDialog} >
+                    </MDBCol>
+                    <MDBCol sm="2">
+                      <MDBBtn color="success" onClick={()=>handelAcceptTask()} >
                         <MDBIcon fas icon="check" className="me-2" />
                         Accept Task
                       </MDBBtn>
                       </MDBCol>
                         <MDBCol sm="2">
-                        <MDBBtn color="danger" onClick={handleEdit} >
+                        <MDBBtn color="danger" onClick={()=>handleRefuseTask()} >
                           <MDBIcon fas icon="ban" className="me-2" />
                           Refuse Task
                         </MDBBtn>
@@ -206,6 +242,14 @@ const DetailPage = () => {
                     </>
                    :(
                     <>
+                    <MDBCol sm="2">
+                      {localStorage.getItem("User ID")==task.taskOwnerId &&
+                      <MDBBtn color="secondary" onClick={()=>navigate('manage')} >
+                        <MDBIcon fas icon="briefcase" className="me-2" />
+                        Manage
+                      </MDBBtn>
+                      }
+                    </MDBCol>
                     <MDBCol sm="2">
                       {localStorage.getItem("User ID")==task.taskOwnerId &&
                       <MDBBtn color="secondary" onClick={handleOpenDialog} >

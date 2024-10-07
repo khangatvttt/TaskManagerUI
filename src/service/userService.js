@@ -3,9 +3,9 @@ import axios from "axios"
 const BASE_ACCOUNT_URL = "http://localhost:8888/api/v1/user"
 class userService{
     
-    getAllTasks(id){
+    getTaskByPage(userId, status, page, size, taskName){
         const token = localStorage.getItem('Token')
-        return axios.get(BASE_ACCOUNT_URL + `/${id}/tasks`,
+        return axios.get(BASE_ACCOUNT_URL + `/${userId}/tasks?status=${status}&page=${page}&size=${size}&taskName=${taskName}`,
                         { headers: 
                             {
                                 "Authorization" : `Bearer ${token}`
@@ -42,6 +42,16 @@ class userService{
           },
         });
       };
+
+    getAvatar(userId){
+        const token = localStorage.getItem('Token')
+        return axios.get(BASE_ACCOUNT_URL + `/${userId}/getavatar`, {
+          headers: {
+            "Authorization" : `Bearer ${token}`
+          },
+        });
+      };
+
     getNotifications(userId, size, page){
         const token = localStorage.getItem('Token')
         return axios.get(BASE_ACCOUNT_URL + `/${userId}/notification?page=${page}&size=${size}`, {
@@ -54,6 +64,15 @@ class userService{
     countUnreadNotification(userId){
       const token = localStorage.getItem('Token')
         return axios.get(BASE_ACCOUNT_URL + `/${userId}/notification/unread-count`, {
+          headers: {
+            "Authorization" : `Bearer ${token}`
+          },
+        });
+    }
+
+    setReadNotification(userId, notificationId, isRead){
+      const token = localStorage.getItem('Token')
+        return axios.get(BASE_ACCOUNT_URL + `/${userId}/notification/${notificationId}?read=${isRead}`, {
           headers: {
             "Authorization" : `Bearer ${token}`
           },

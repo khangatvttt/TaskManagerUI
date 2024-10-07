@@ -10,6 +10,7 @@ import SignUp from './SignUp';
 import Test from './test';
 import VerifyEmail from './verifyEmail';
 import EditProfile from './EditProfile';
+import ManageMember from './ManageMemberTask';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="user/:userId/task/:taskId/edit" element={<EditTask />} />
         <Route path="user/:userId/profile" element={<ProfilePage />} />
         <Route path="user/:userId/editprofile" element={<EditProfile />} />
+        <Route path="user/:userId/task/:taskId/manage" element={<ManageMember />} />
         <Route path="register" element={<SignUp />} />
         <Route path="verify" element={<VerifyEmail />} />
         <Route path="test" element={<Test />} />

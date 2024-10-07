@@ -4,3 +4,9 @@
     z-index: 1000;
 }
 
+.avatarHeader {
+    width: 22px; /* Đặt chiều rộng và chiều cao giống nhau */
+    height: 22px;
+    border-radius: 50%; /* Đảm bảo hình tròn */
+    object-fit: cover; /* Đảm bảo giữ tỷ lệ hình ảnh */
+  }

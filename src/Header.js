@@ -21,6 +21,7 @@ import { useNavigate } from 'react-router-dom';
 import './Header.css'
 import userService from './service/userService';
 import { formatDistanceToNow } from 'date-fns';
+import { ca } from 'date-fns/locale';
 
 function Header() {
   const navigate = useNavigate()
@@ -29,6 +30,8 @@ function Header() {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [unreadNumber, setUnreadNumber] = useState(0)
+  const [avatar, setAvatar] = useState('')
+  const [searchInput, setSearchInput] = useState('')
 
   useEffect(() => {
     const pageSize = 5
@@ -54,6 +57,10 @@ function Header() {
     userService.countUnreadNotification(localStorage.getItem("User ID"))
     .then(res => setUnreadNumber(res.data))
     .catch(err => console.log(err))
+
+    userService.getAvatar(localStorage.getItem("User ID"))
+    .then(res => setAvatar(res.data))
+    .catch(err=> console.log(err))
   }, [])
 
   const loadMoreNotifications = (event) => {
@@ -67,8 +74,26 @@ function Header() {
     console.log(path)
   }
 
-  const handleNavigation = (path) => {
+  const handleNavigationNotification = (path, notificationId, isRead) => {
+    if (!isRead){
+      userService.setReadNotification(localStorage.getItem("User ID"), notificationId, true)
+      setUnreadNumber(prev => prev - 1)
+      const updatedNoti = notifications.map((noti) =>
+      noti.id === notificationId ? { ...noti, read: true } : noti
+      );
+      setNotifications(updatedNoti);
+    }
     navigate(path)
+  }
+
+  const handleChangeSearch = (e) =>{
+    setSearchInput(e.target.value)
+  }
+
+  const handleKeyDown = (e) =>{
+    if (e.key === 'Enter'){
+      navigate(`/home?taskName=${searchInput}`);
+    }
   }
 
 
@@ -88,8 +113,11 @@ function Header() {
               autoComplete='off'
               className='active'
               type='search'
-              placeholder='Search (ctrl + "/" to focus)'
+              placeholder='Search task (Enter to search)'
               style={{ minWidth: '225px' }}
+              value={searchInput}
+              onChange={handleChangeSearch}
+              onKeyDown={handleKeyDown}
             />
           </MDBInputGroup>
 
@@ -105,7 +133,7 @@ function Header() {
                 <MDBDropdownMenu style={{ maxHeight: '300px', overflowY: 'auto' }}>
                   {notifications.length > 0 ? (
                     notifications.map((notification, index) => (
-                      <MDBDropdownItem key={index} link onClick={()=>handleNavigation(notification.targetUrl)}>
+                      <MDBDropdownItem key={index} link onClick={()=>handleNavigationNotification(notification.targetUrl, notification.id, notification.read)}>
                         {!notification.read && (
                           <span 
                             style={{
@@ -171,15 +199,15 @@ function Header() {
               <MDBDropdown>
                 <MDBDropdownToggle tag='a' className='hidden-arrow d-flex align-items-center nav-link'>
                   <img
-                    src='https://mdbootstrap.com/img/new/avatars/2.jpg'
-                    className='rounded-circle'
+                    src={avatar}
+                    className='avatarHeader'
                     height='22'
                     alt='Avatar'
                     loading='lazy'
                   />
                 </MDBDropdownToggle>
                 <MDBDropdownMenu>
-                  <MDBDropdownItem link onClick={()=>handleNavigation(`/user/${localStorage.getItem('User ID')}/profile`)}>MyProfile</MDBDropdownItem>
+                  <MDBDropdownItem link onClick={()=>navigate(`/user/${localStorage.getItem('User ID')}/profile`)}>MyProfile</MDBDropdownItem>
                   <MDBDropdownItem link>Settings</MDBDropdownItem>
                   <MDBDropdownItem link onClick={()=>logout()}>Logout</MDBDropdownItem>
                 </MDBDropdownMenu>

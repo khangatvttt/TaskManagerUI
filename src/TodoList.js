@@ -16,9 +16,11 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import Pagination from '@mui/material/Pagination';
+import Stack from '@mui/material/Stack';
 
 import DialogTitle from '@mui/material/DialogTitle';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import taskService from './service/taskService';
 
 
@@ -31,32 +33,55 @@ const TodoList = () => {
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [taskTarget, setTaskTarget] = useState(null); // Store the task that show in Dialog
     const [contentSnackbar, setContentSnackbar] = useState('')
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPage, setTotalPage] = useState(0);
+    const [taskNameSearch, setTaskNameSearch] = useState(null);
 
     const navigate = useNavigate();
+    const location = useLocation();
 
-    const [tasks, setTasks] = useState([
-        { id: 1, taskName: 'Create a react project ✌️', status: false, timestamp: '5:23 AM, 01/06/2022', priority: 1, dueAt: '5:23 AM, 01/06/2022', description: 'haha', createAt: '5:23 AM, 01/06/2022'},
-        { id: 2, text: 'Learn React ❤️', completed: false, timestamp: '5:22 AM, 01/06/2022' },
-        { id: 3, text: 'Create a Todo App 📋', completed: true, timestamp: '5:21 AM, 01/06/2022' }
-    ]);
+    const [tasks, setTasks] = useState({});
     const [filter, setFilter] = useState('All');
 
     useEffect(() => {
-        const fetchData = async () => {
-            userService.getAllTasks(localStorage.getItem('User ID'))
-            .then(res =>{
-                setTasks(res.data)
+        const taskName = new URLSearchParams(location.search).get('taskName') || '';
+        fetchData(currentPage, filter, taskName);
+    }, [location.search]);
+
+
+    const fetchData = async (currentPage, filter, searchQuery) => {
+
+        const sizeEachPage = 4
+        userService.getTaskByPage(localStorage.getItem('User ID'), filter, currentPage - 1, sizeEachPage, searchQuery)
+            .then(res => {
+                setTasks(prevTasks => ({
+                    ...prevTasks,
+                    [filter]: {
+                        ...prevTasks[filter],
+                        [currentPage]: res.data || []
+                    }
+                }))
+                setTotalPage(res.headers['x-total-pages'])
             })
-            .catch(e=>{
+            .catch(e => {
                 console.log(e)
                 console.log(e.response.data)
                 setError(e.response.data);
             })
 
-        };
-    
-        fetchData();
-    }, []);
+    };
+
+    useEffect(() => {
+        const taskName = new URLSearchParams(location.search).get('taskName')
+        //always fetch if user search
+        if (taskName!=null){
+            fetchData(currentPage, filter, taskName);
+        }
+        //If page hasn't been fetched, fetch it
+        else if ((!tasks[filter] || !tasks[filter][currentPage])) {
+            fetchData(currentPage, filter, '');
+        }
+    }, [currentPage, filter]);
 
     const handleAddTask = () => {
         navigate('/createTask')
@@ -68,48 +93,45 @@ const TodoList = () => {
     };
 
     const handleDeleteTask = (task) => {
-        setTaskTarget(task); 
-        setOpen(true); 
+        setTaskTarget(task);
+        setOpen(true);
     };
 
     const handleConfirmDeleteTask = () => {
         if (!taskTarget) return;
 
         taskService.abandonTaskAssignment(taskTarget.taskId, localStorage.getItem('User ID'))
-        .then(() => {
-            const updatedTasks = tasks.filter(task => task.taskId !== taskTarget.taskId);
-            setTasks(updatedTasks);
-            setSnackbarOpen(true);
-            setContentSnackbar('Delete Successfully!')
-            setOpen(false);
-        })
-        .catch(e => {
-            console.log(e);
-            setError(e);
-        });
+            .then(() => {
+                setTasks({})
+                fetchData(currentPage, filter)
+                setSnackbarOpen(true);
+                setContentSnackbar('Delete Successfully!')
+                setOpen(false);
+            })
+            .catch(e => {
+                console.log(e);
+                setError(e);
+            });
     };
 
+
     const handleAcceptRefuseTask = (taskId) => {
-        if (openAccept==='accept'){
+        if (openAccept === 'accept') {
             taskService.acceptTask(taskId, localStorage.getItem('User ID'))
-            .then(()=>{
-                setSnackbarOpen(true);
-                setContentSnackbar('You have joined task successfully')
-                const updatedTasks = tasks.map((task) =>
-                task.taskId === taskId ? { ...task, accept: true } : task
-                );
-                setTasks(updatedTasks);
-                
-            })
-            .catch(e=>{
-                console.log(e)
-                setError(e)
-            })
-                
-            
+                .then(() => {
+                    setSnackbarOpen(true);
+                    setContentSnackbar('You have joined task successfully')
+                    window.location.reload()
+                })
+                .catch(e => {
+                    console.log(e)
+                    setError(e)
+                })
+
+
         }
         else (
-           handleConfirmDeleteTask()
+            handleConfirmDeleteTask()
         )
         setOpenAccept('close')
     }
@@ -132,40 +154,53 @@ const TodoList = () => {
 
     const handleCloseSnackbar = (event, reason) => {
         if (reason === 'clickaway') {
-          return;
+            return;
         }
-    
+
         setSnackbarOpen(false);
     };
 
-    if (error){
+    const handleChangePage = (event, value) => {
+        setCurrentPage(value);
+    };
+
+    const handleFilterChange = (e) => {
+        setFilter(e.target.value);
+        setCurrentPage(1); // Reset to the first page when the filter changes
+    };
+
+    const currentTasks = (tasks[filter] && tasks[filter][currentPage]) || [];
+
+    if (error) {
         return (
             <div>
-                {error.status=='Unauthorized'?'Your login has expired, please login again.':error.error}
+                {error.status == 'Unauthorized' ? 'Your login has expired, please login again.' : error.error}
             </div>
         )
     }
-
-    const filteredTasks = filter === 'All' ? tasks : tasks.filter(task => filter === 'Completed' ? task.completed : !task.completed);
 
     return (
         <div>
             <Header />
             <div className="body-todo">
-                <div className="todo-list"> 
-                    <h1>TODO LIST</h1>
+                <div className="todo-list">
+                    <h1>TASK LIST</h1>
                     <div className="header">
-                        <button onClick={handleAddTask}>New Task</button>
-                        <select value={filter} onChange={(e) => setFilter(e.target.value)}>
+                        <Button onClick={handleAddTask} className='newTaskButton'>New Task</Button>
+                        <Stack spacing={2}>
+                            <Pagination count={totalPage} page={currentPage} onChange={handleChangePage} color="primary" />
+                        </Stack>
+                        <select value={filter} onChange={handleFilterChange}>
                             <option value="All">All</option>
                             <option value="Completed">Completed</option>
                             <option value="Delayed">Delayed</option>
                             <option value="Cancelled">Cancelled</option>
                             <option value="InProgress">In progress</option>
+                            <option value="Invitation">Invitation</option>
                         </select>
                     </div>
                     <ul className="task-list">
-                        {filteredTasks.map(task => (
+                        {currentTasks.map(task => (
                             <li key={task.taskId} className='task'>
                                 <div className="task-text ms-1">
                                     <div className="ms-1">
@@ -173,24 +208,24 @@ const TodoList = () => {
                                     </div>
                                     <i className="timestamp ms-1">Your task: {task.subTask}</i>
                                     <div className="timestamp ms-1">
-                                        Deadline: {Moment(task.dueAt).format('HH:mm DD-MM-yyyy')} 
-                                        <div className="countdown-container"> 
+                                        Deadline: {Moment(task.dueAt).format('HH:mm DD-MM-yyyy')}
+                                        <div className="countdown-container">
                                             (<CountDownTimer targetDate={task.dueAt} />)
                                         </div>
                                     </div>
                                     <StatusBadge status={task.status} />
                                 </div>
                                 <div className="actions">
-                                    {task.accept?(
-                                    <>
-                                        <Button variant="outlined" color="error" onClick={() => handleDeleteTask(task)} startIcon={<DeleteIcon />}>Delete</Button>
-                                        <Button variant="outlined" color="secondary" onClick={() => navigate(`/user/${localStorage.getItem("User ID")}/task/${task.taskId}/edit`)} startIcon={<EditIcon />}>Edit</Button>
-                                    </>)
-                                    :(
-                                    <>
-                                        <Button variant="outlined" color="success" onClick={() => handleAcceptClick(task)} startIcon={<PlaylistAddCheckIcon />}>Accept</Button>
-                                        <Button variant="outlined" color="error" onClick={() => handleRefuseClick(task)} startIcon={<ClearIcon />}>Refuse</Button>
-                                    </>)}
+                                    {task.accept ? (
+                                        <>
+                                            <Button variant="outlined" color="error" onClick={() => handleDeleteTask(task)} startIcon={<DeleteIcon />}>Delete</Button>
+                                            <Button variant="outlined" color="secondary" onClick={() => navigate(`/user/${localStorage.getItem("User ID")}/task/${task.taskId}/edit`)} startIcon={<EditIcon />}>Edit</Button>
+                                        </>)
+                                        : (
+                                            <>
+                                                <Button variant="outlined" color="success" onClick={() => handleAcceptClick(task)} startIcon={<PlaylistAddCheckIcon />}>Accept</Button>
+                                                <Button variant="outlined" color="error" onClick={() => handleRefuseClick(task)} startIcon={<ClearIcon />}>Refuse</Button>
+                                            </>)}
 
                                 </div>
                             </li>
@@ -217,16 +252,16 @@ const TodoList = () => {
                 </DialogActions>
             </Dialog>
             <Dialog
-                open={openAccept!='close'}
+                open={openAccept != 'close'}
                 onClose={handleClose}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description">
                 <DialogTitle id="alert-dialog-title" >
-                    {openAccept==='accept'&&`Do you want to join '${taskTarget?.taskName}' task?`}
-                    {openAccept==='refuse'&&`Do you want to refuse '${taskTarget?.taskName}' task?`}
+                    {openAccept === 'accept' && `Do you want to join '${taskTarget?.taskName}' task?`}
+                    {openAccept === 'refuse' && `Do you want to refuse '${taskTarget?.taskName}' task?`}
                 </DialogTitle>
                 <DialogActions>
-                    <Button onClick={()=>handleAcceptRefuseTask(taskTarget?.taskId)} color="error">{openAccept==='accept'?'Join':'Refuse'}</Button>
+                    <Button onClick={() => handleAcceptRefuseTask(taskTarget?.taskId)} color="error">{openAccept === 'accept' ? 'Join' : 'Refuse'}</Button>
                     <Button onClick={handleClose} autoFocus>Cancel</Button>
                 </DialogActions>
             </Dialog>

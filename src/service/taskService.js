@@ -73,6 +73,16 @@ class userService{
         )
     }
 
+    getMemberOfTask(taskId){
+        const token = localStorage.getItem('Token')
+        return axios.get(BASE_ACCOUNT_URL + `/${taskId}/users`,
+                        { headers: 
+                            {
+                                "Authorization" : `Bearer ${token}`
+                            } 
+                        })
+    }
+
 }
 
 export default new userService()
